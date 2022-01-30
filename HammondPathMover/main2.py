@@ -62,7 +62,6 @@ def changing_board(n = 30, ensemble_size = 2, framerate = 24, num_reps = 5):
 #changing_board(n = 30, ensemble_size = 1, framerate = 24, num_reps  =500)
 
 
-
 B = Board(50,2)
 C = Board(50,1)
 C.body = B.body

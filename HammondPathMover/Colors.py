@@ -1,4 +1,4 @@
-
+from colorama import Fore, Style
 
 class bcolors:
     Green = '\033[92m' #GREEN
@@ -34,7 +34,8 @@ def bGreen(string):
     return bcolors.GREEN + string + bcolors.RESET
 
 def bGray(string):
-    return bcolors.Gray + string + bcolors.RESET
+    return (f'{Fore.GRAY}' + string + f'{Style.RESET_ALL}')
+
 
 def bOrange(string):
-    return bcolors.Orange + string + bcolors.RESET
+    return (f'{Fore.YELLOW}' + string + f'{Style.RESET_ALL}')
