@@ -290,3 +290,15 @@ class Board:
 
         tuple_list = np.array(tuple_list)
         return tuple_list[np.all(tuple_list < self.size, axis = 1)]
+
+        def disp_from_middle(self): #calculates the displacement from the middle of the halfway point
+            self.highlightPathFrom()
+            is_first = True
+            for i in range(self.size):
+                if abs(self.body[self.size - i - 1][i]) == 2:
+                    if is_first:
+                        first = i - (self.size-1)/2.
+                        is_first = False
+                    last = i - (self.size-1)/2.
+            self.highlightPathFrom(highlighting = False)
+            return (first + last)/2
