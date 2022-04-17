@@ -8,9 +8,11 @@ import matplotlib.pyplot as plt
 #these mostly run fairly quickly for n < 40 and ensemble_size <= 3, but for larger n slows down
 #and for larger ensemble_size slows down very quickly
 
-#initializes the board, then drags the endpoint of the ensemble
-# from the top right to the top left and displays the transtions
+
 def moving_end_point(n = 70, ensemble_size = 3):
+    #initializes the board, then drags the endpoint of the ensemble
+    # from the top right to the top left and displays the transtions
+    
     B = Board(n, ensemble_size)
 
     coord1 = (n - ensemble_size) * np.ones(2 * ensemble_size, dtype = np.int16)
@@ -35,8 +37,9 @@ def moving_end_point(n = 70, ensemble_size = 3):
         time.sleep(0.1)
 
 
-#initializes board, then repeatedly flips random grid points and updates the ensemble
 def changing_board(n = 30, ensemble_size = 2, framerate = 24, num_reps = 5):
+    #initializes board, then repeatedly flips random grid points and updates the ensemble
+
     B = Board(n, ensemble_size)
     t_l = time.time()
     for i in range(num_reps):
@@ -47,9 +50,10 @@ def changing_board(n = 30, ensemble_size = 2, framerate = 24, num_reps = 5):
         B.flip_random_and_update()
 
 
-#initializes reps number of boards with ensemble size 1, then
-#creates a histogram of the displacements of the curves from the diagonal
+
 def init_disp_distrib(n=100, reps = 100):
+    #initializes reps number of boards with ensemble size 1, then
+    #creates a histogram of the displacements of the curves from the diagonal
     data = []
     for i in range(reps):
         B = Board(n)
@@ -59,10 +63,11 @@ def init_disp_distrib(n=100, reps = 100):
     plt.show()
 
 
-#number of times a random space on the board is flipped
-#for position of middle of path to fully switch over diagonal
-#this runs very slowly for large n, normally computer must be left to run for moderate size tests
+
 def time_flip_disp(n = 50):
+    #number of times a random space on the board is flipped
+    #for position of middle of path to fully switch over diagonal
+    #this runs very slowly for large n, normally computer must be left to run for moderate size tests
     num = 0
     B = Board(n)
     init_disp = B.disp_from_middle()
@@ -81,8 +86,9 @@ def time_flip_disp(n = 50):
 
     return (init_disp,num)
 
-#creates scatterplot of time_flip_disp for many iterations
 def time_flip_data(n = 100, reps = 100):
+    #creates scatterplot of time_flip_disp for many iterations
+
     init_data = []
     num_data = []
     for rep in range(reps):
