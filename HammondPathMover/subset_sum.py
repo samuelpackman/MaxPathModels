@@ -1,4 +1,5 @@
-#generates all values that add to target. I don't know how it works its a black box.
+#generates all values that add to target. uses recursive algorithm more
+#found on web
 #webpage is https://stackoverflow.com/questions/4632322/finding-all-possible-combinations-of-numbers-to-reach-a-given-sum
 import numpy as np
 

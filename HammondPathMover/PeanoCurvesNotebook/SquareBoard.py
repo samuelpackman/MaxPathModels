@@ -52,6 +52,7 @@ class Board:
                     change += [1,0]
             self.changes[i] = np.array(change)
 
+        self.opt_path_vals = np.empty((self.size, self.ensemble_size))
 
 
         self.randomize_board()
@@ -134,16 +135,6 @@ class Board:
             best_move_score = move_scores[arg_max]
 
 
-            # best_move = valid_moves[0]
-            # best_move_score = self.score_array[tuple(best_move)]
-            #
-            # for move in valid_moves[1:]:
-            #     move_score = self.score_array[tuple(move)]
-            #     if move_score > best_move_score:
-            #         best_move = move
-            #         best_move_score = move_score
-
-
             self.move_array[i] = best_move
             new_score += best_move_score
 
@@ -165,43 +156,18 @@ class Board:
 
                 if has_changed or is_init:
 
-                    # pos_next_inds = np.tile(np.array(ind), (2 ** self.ensemble_size, 1)) + self.changes
-                    #
-                    # valid_inds = pos_next_inds[np.all(pos_next_inds < self.size) and np.all(pos_next_inds[0:-2:2] < pos_next_inds[2::2])]
-                    #
-                    # for valid in valid_inds:
-                    #     new_inds.add(tuple(valid))
+
                     pos_moves = np.tile(np.array(ind), (2 ** self.ensemble_size, 1)) + self.changes
 
                     cond1 = np.all(pos_moves < self.size , axis = 1)
                     cond2 = np.all(pos_moves[:,0:-2:2] < pos_moves[:,2::2], axis = 1)
                     valid_moves = pos_moves[np.logical_and(cond1, cond2)]
 
-                    for move in valid_moves:
-                        new_inds.add(tuple(move))
-
-                    #for change in self.changes:
-                        # next_ind = tuple(np.array(ind) + change)
-                        #
-                        # valid_move  = True
-                        #
-                        # #order of chord conditions
-                        # #ind[0] < ind[2] is the condition we are enforcing
-                        # for j in range(0,2 * self.ensemble_size-2,2):
-                        #     if next_ind[j] >= next_ind[j+2]:
-                        #         valid_move = False
-                        #
-                        # for j in next_ind:
-                        #     if j >= self.size:
-                        #         valid_move = False
-                        #
-                        # if valid_move:
-                        #     new_inds.add(next_ind)
-
-
+                    inds = inds.union([tuple(move) for move in valid_moves])
 
             inds = new_inds
         #print("num_calls:" + str(num_calls))
+        self.update_opt_path()
 
     def updatepath_array_from(self, i, is_init = False):
         self.updatepath_array_from_inds({i}, is_init)
@@ -242,6 +208,8 @@ class Board:
 
             inds = new_inds
 
+    def update_opt_path(self):
+
     def highlight_path_from_end(self, highlighting = True):
         coord1 =  np.tile((self.size - self.ensemble_size), 2 * self.ensemble_size)
         i = 0
@@ -263,8 +231,8 @@ class Board:
         i = (random.randint(0, self.size - 1), random.randint(0, self.size - 1))
         val = self.X_realize()
         self.flip_coord_and_update(i, val)
-        
-    
+
+
     def flip_coord_and_update(self, i, val):
         self.body[i] = val
 
@@ -272,8 +240,8 @@ class Board:
         for ind in self.find_inds_from_bodyind(i):
             update_inds.add(tuple(ind))
         self.updatepath_array_from_inds(update_inds, is_init = False)
-        
-        
+
+
     def find_inds_from_bodyind(self,body_ind):
         tuple_list = []
 
@@ -301,6 +269,8 @@ class Board:
 
     def scores_from(self, i, highlighting = True):
         scores = np.zeros(self.ensemble_size)
+
+
 
         inds = {i}
 

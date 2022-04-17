@@ -218,12 +218,21 @@ class Board:
                 for j in range(0, 2 * self.ensemble_size,2):
                     k = ind[j:j+2]
 
-                    if highlighting == True:
-                        if abs(self.body[k]) != 2:
-                            self.body[k] *= 2
-                    else:
-                        if abs(self.body[k]) == 2:
-                            self.body[k] /= 2
+                    try:
+                        if highlighting == True:
+                            if abs(self.body[k]) != 2:
+                                self.body[k] *= 2
+                        else:
+                            if abs(self.body[k]) == 2:
+                                self.body[k] /= 2
+                    except:
+                        print("ind", ind)
+                        print("j",j)
+                        print("k",k)
+                        print("body[k]",self.body[k])
+                        print("body",self.body)
+
+                        exit()
 
                 next_ind = tuple(self.move_array[ind])
 
@@ -246,8 +255,6 @@ class Board:
         coord = coord1 + np.array(coord2)
         self.highlight_path_from(tuple(coord), highlighting)
 
-    def unhighlight_path_from(self,ind1, ind2):
-        self.highlight_path_from(ind1, ind2, False)
 
     def flip_random_and_update(self):
         i = (random.randint(0, self.size - 1), random.randint(0, self.size - 1))
@@ -281,3 +288,24 @@ class Board:
 
         tuple_list = np.array(tuple_list)
         return tuple_list[np.all(tuple_list < self.size, axis = 1)]
+
+    def disp_from_middle(self): #calculates the displacement from the middle of the halfway point
+        self.highlight_path_from_end()
+        is_first = True
+        for i in range(self.size):
+            if abs(self.body[self.size - i - 1][i]) == 2:
+                if is_first:
+                    first = i - (self.size-1)/2.
+                    is_first = False
+                last = i - (self.size-1)/2.
+        self.highlight_path_from_end(highlighting = False)
+        return (first + last)/2
+
+    def num_under_path(self): #counts the number of grid spaces that are bounded above by the path, only for 1 ensembles
+        num = 0
+        for row in range(self.size):
+            for col in range(self.size-1,-1,-1):
+                if abs(self.body[row][col]) == 2:
+                    num += col + 1
+                    break
+        return num

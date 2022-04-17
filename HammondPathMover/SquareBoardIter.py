@@ -36,27 +36,29 @@ class Board:
         self.ensemble_size = ensemble_size
 
         # 2*ensemble_size dimensional np array side lengths size
-        self.move_array = np.zeros(tuple([size for i in range(2 * ensemble_size)] + [2 * ensemble_size]), dtype = np.int16)
+        self.move_arrays = [np.zeros(tuple((2 * e) * [size] + [2 * e]), dtype = np.int16) for e in range(1, ensemble_size + 1)]
         #stores the end locations of the moves not the 0/1 move values
-        self.score_array = np.zeros(tuple([size for i in range(2 * ensemble_size)]))
+        self.score_arrays = [np.zeros(tuple((2 * e) * [size])) for e in range(1, ensemble_size+1)]
         #stores the score at each point
 
-        self.changes = np.zeros((2**ensemble_size, 2 * ensemble_size), dtype = np.int16)
+        self.changes = [np.zeros((2**e, 2 * e), dtype = np.int16) for e in range(1, ensemble_size+1)]
 
-        pos_changes = list(itertools.product([0, 1], repeat=ensemble_size))
-        for i in range(2 ** ensemble_size):
-            change = []
-            for j in pos_changes[i]:
-                if j == 0:
-                    change += [0,1]
-                else:
-                    change += [1,0]
-            self.changes[i] = np.array(change)
+        for e in range(1, ensemble_size+1):
+            pos_changes = list(itertools.product([0, 1], repeat=e))
+            for i in range(2 ** e):
+                change = []
+                for j in pos_changes[i]:
+                    if j == 0:
+                        change += [0,1]
+                    else:
+                        change += [1,0]
+                self.changes[e][i] = np.array(change)
 
 
 
         self.randomize_board()
-        self.update_whole_path_array(is_init = True)
+        for e in range(1,ensemble_size+1)
+        self.update_whole_path_array(e,is_init = True)
 
     def __str__(self):
         retString = ""
@@ -107,12 +109,12 @@ class Board:
     def get_score_at_points(self,i):
         return sum([self.body[i[j:j+2]] for j in range(0,2 * self.ensemble_size,2)])
 
-    def updatepath_array_at(self,i): #returns true if changes value, false else
+    def updatepath_array_at(self,i, ensemble_size_num): #returns true if changes value, false else
         #i is position in move_array self.move_array[i] indexes the move
         # print(i)
         # print(np.tile(np.array(i), (2 ** self.ensemble_size, 1)))
         # print(self.changes)
-        pos_moves = np.tile(np.array(i), (2 ** self.ensemble_size, 1)) - self.changes
+        pos_moves = np.tile(np.array(i), (2 ** ensemble_size_num, 1)) - self.changes[ensemble_size_num]
 
         cond1 = np.all(pos_moves >= 0, axis = 1)
         cond2 = np.all(pos_moves[:,0:-2:2] < pos_moves[:,2::2], axis = 1)
@@ -122,7 +124,7 @@ class Board:
         #sum([self.body[i[j:j+2]] for j in range(0,2 * self.ensemble_size,2)])
 
         if np.size(valid_moves) == 0: #should only occur when all chords are adjacent on first or last possible diagonal
-            self.move_array[i] = np.tile(-1,(2* self.ensemble_size))
+            self.move_array[i] = np.tile(-1,(2* ensemble_size_num))
 
         else:
             move_scores = np.array([self.score_array[tuple(move)] for move in valid_moves])
@@ -153,14 +155,14 @@ class Board:
             self.score_array[i] = new_score
             return True
 
-    def updatepath_array_from_inds(self,inds, is_init = False):
+    def updatepath_array_from_inds(self,inds, ensemble_size_num, is_init = False):
         num_calls = 0
         while len(inds) > 0:
             new_inds = set()
             for ind in inds:
                 num_calls += 1
 
-                has_changed = self.updatepath_array_at(ind)
+                has_changed = self.updatepath_array_at(ind, ensemble_size_num)
 
                 if has_changed or is_init:
 
@@ -170,7 +172,7 @@ class Board:
                     #
                     # for valid in valid_inds:
                     #     new_inds.add(tuple(valid))
-                    pos_moves = np.tile(np.array(ind), (2 ** self.ensemble_size, 1)) + self.changes
+                    pos_moves = np.tile(np.array(ind), (2 ** self.ensemble_size, 1)) + self.changes[ensemble_size_num]
 
                     cond1 = np.all(pos_moves < self.size , axis = 1)
                     cond2 = np.all(pos_moves[:,0:-2:2] < pos_moves[:,2::2], axis = 1)
@@ -202,10 +204,10 @@ class Board:
             inds = new_inds
         #print("num_calls:" + str(num_calls))
 
-    def updatepath_array_from(self, i, is_init = False):
-        self.updatepath_array_from_inds({i}, is_init)
+    def updatepath_array_from(self, i, ensemble_size_num, is_init = False):
+        self.updatepath_array_from_inds({i}, ensemble_size_num, is_init)
 
-    def update_whole_path_array(self, is_init = False):
+    def update_whole_path_array(self, ensemble_size_num, is_init = False):
         t_0 = time.time()
         #sum of values in each pair should add to #ensemble-1
         i = 0
@@ -217,7 +219,7 @@ class Board:
             i += 1
             j -= 1
 
-        self.updatepath_array_from(tuple(coord), is_init)
+        self.updatepath_array_from(tuple(coord), ensemble_size_num, is_init)
         #print(time.time() - t_0)
 
     def highlight_path_from(self, i, highlighting = True):

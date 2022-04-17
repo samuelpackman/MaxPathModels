@@ -1,4 +1,4 @@
-from SquareBoard7 import Board
+from SquareBoard import Board
 import time
 import numpy as np
 import matplotlib.pyplot as plt
